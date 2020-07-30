@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+<a href="http://localhost:3000/content?name=100MB.zip" download="downloaded.zip">
+  download
+</a>
+<button onclick="download()">Download content</button>
+
+<script>
+function download() {
+  const filename = encodeURIComponent("100MB.zip")
+  const downloadUrl = `http://localhost:3000/contented?name=${filename}`;
+  const aDownloadHref = document.createElement("a");
+  aDownloadHref.href = downloadUrl;
+  aDownloadHref.download = "download-test.zip";
+  document.body.appendChild(aDownloadHref);
+  aDownloadHref.click();
+  document.body.removeChild(aDownloadHref);
+}
+</script>
+
+</body>
+</html>
+
