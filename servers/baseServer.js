@@ -1,10 +1,11 @@
 const express = require('express');
 const request = require('request');
+// const fs = require('fs');
 const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => res.send('Hello World!'));
-app.get('/contented', (req, res) => {
+app.get('/content', (req, res) => {
   console.log("%%% content");
   const filename = encodeURIComponent(req.query.name) || "";
   const url = `http://localhost:3001/download?name=${filename}`;
@@ -14,10 +15,13 @@ app.get('/contented', (req, res) => {
       headers: {
         'Accept': 'application/zip',
         'Accept-Charset': 'utf-8',
-      }
+      },
+      encoding: null,
+      json: true
   };
 
-  request(options)
+  let responseStatus;
+  const requests = request(options)
     .on('error', (err) => {
       console.error('error: ', err);
     })
@@ -27,21 +31,16 @@ app.get('/contented', (req, res) => {
     .on('response', (response, body) => {
       console.log("**** response status: ", response.statusCode);
       console.log("**** response body: ", body);
-      if (response.statusCode !== 200) {
+      if (response.statusCode === 200) {
+        responseStatus = 200;
+        requests.pipe(res);
+        // To save to the local file system
+        // requests.pipe(fs.createWriteStream(filename + '.zip'));
+      } else {
+        responseStatus = 500;
         res.status(response.statusCode).send({ message: "Failed to downloaded" });
       }
-      // if (response.statusCode === 200) {
-      //   res.status(200).send({ message: "Sucessfully downloaded" });
-      // } else {
-      //   res.status(response.statusCode).send({ message: "Failed to downloaded" });
-      // }
     })
-    .pipe(res)
-    .on("finish", (response) => {
-      console.log("**** finished: response === ", response);
-      console.log("**** fininshed!!");
-      res.status(200).send({ message: "Sucessfully downloaded" });
-    });
 });
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))

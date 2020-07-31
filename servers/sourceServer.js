@@ -12,8 +12,6 @@ app.get('/download', (req, res) => {
   const filePath = path.resolve(__dirname, "..", "static", filename);
   const stream = fs.createReadStream(filePath);
 
-  console.log("*** filepath = ", filePath);
-
   // Handle non-existent file
   stream.on('error', function(error) {
     res.writeHead(404, 'Not Found');
